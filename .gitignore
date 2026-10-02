@@ -1,0 +1,23 @@
+# secrets
+.env
+.streamlit/secrets.toml
+
+# data that scripts regenerate (too big for GitHub)
+data/raw/
+data/olist.db
+powerbi/data/
+results/sql/
+
+# python
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+venv/
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+~$*.xlsx

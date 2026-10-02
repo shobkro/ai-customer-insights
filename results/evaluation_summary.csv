@@ -1,0 +1,2 @@
+provider,labelled,sentiment_vs_stars_acc,sentiment_vs_stars_f1,gold_n,gold_sentiment_acc,gold_topic_acc,gold_topic_macro_f1,complaint_topic_acc
+rules,40040,0.6216533466533467,0.5399571554165803,150,0.6533333333333333,0.5533333333333333,0.5290559174867686,0.5466666666666666
