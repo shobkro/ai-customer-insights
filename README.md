@@ -1,6 +1,6 @@
 # 📦 AI Customer Insights: E-commerce Analytics with Free LLMs
 
-**An end-to-end analytics project that uses AI to turn 40,000 customer reviews into structured data, then answers business questions with SQL, Python, Power BI and Excel. The AI's accuracy is measured, not assumed.**
+**An end-to-end analytics project that uses a free local AI to turn written customer reviews into structured data (2,149 labelled so far; the same code scales to all 40,000), then answers business questions with SQL, Python, Power BI and Excel. The AI's accuracy is measured, not assumed.**
 
 ![Python](https://img.shields.io/badge/Python-3.10+-blue) ![SQL](https://img.shields.io/badge/SQL-SQLite%20%7C%20PostgreSQL-lightgrey) ![Power BI](https://img.shields.io/badge/Power%20BI-Desktop-yellow) ![Excel](https://img.shields.io/badge/Excel-KPI%20Pack-green) ![LLM](https://img.shields.io/badge/LLM-Ollama%20%7C%20Groq%20%7C%20Gemini-purple) ![Cost](https://img.shields.io/badge/cost-%C2%A30-brightgreen)
 
@@ -23,12 +23,12 @@ This project answers three questions:
 | 1 | **Late delivery is the biggest driver of bad reviews.** Late orders average **2.57★** vs **4.29★** on time, and **54%** of late orders get 1–2 stars (vs 9%). | `sql/02_analysis_queries.sql` Q3 |
 | 2 | The damage starts fast: **1–3 days late → 3.75★**, **8+ days late → 1.73★**. | Q4 |
 | 3 | Only **8.1%** of orders are late, but it's very uneven by region: **Alagoas 23.9%**, **Maranhão 19.6%** vs **São Paulo 5.9%**. | Q6 |
-| 4 | **"Not received"** is the most common complaint, then **wrong or missing items**, so the problem is fulfilment as much as speed. | Q9 (AI labels) |
+| 4 | The AI shows the biggest complaint isn't speed: **wrong or missing items (30%)** and **not received (20%)** make up half of all complaints, ahead of late delivery (13%). Fulfilment accuracy matters as much as speed. | Q9 (AI labels, 2,149 reviews) |
 | 5 | Repeat purchase is low for everyone (~3%), and a bad first review barely changes it (3.1% vs 3.2%). This marketplace's loyalty problem isn't caused by bad reviews alone. | Q7 |
 
 ![Rating vs lateness](docs/images/rating_vs_lateness.png)
 
-**Recommendation:** focus logistics on the north-east states with the highest late rates, set delivery estimates more conservatively there, and route "not received" / "wrong item" reviews (the *high-urgency* AI label) straight to customer service.
+**Recommendation:** check orders are packed correctly before dispatch, focus logistics on the north-east states with the highest late rates, and route "not received" / "wrong item" reviews (the *high-urgency* AI label) straight to customer service.
 
 ---
 
@@ -62,8 +62,8 @@ Evaluated on 150 hand-labelled reviews (`data/eval/gold_labels.csv`). Full repor
 | Method | Sentiment vs stars | Sentiment (hand labels) | Topic (hand labels) | **Complaint topic** |
 |---|---|---|---|---|
 | Keyword baseline (no AI) | 62.2% | 65.3% | 55.3% | 54.7% |
-| **LLM via Ollama (local, free)** | **77.5%** | **84.7%** | **62.7%** | **73.3%** |
-| Improvement | +15.3 pts | +19.4 pts | +7.4 pts | **+18.6 pts** |
+| **LLM via Ollama (local, free)** | **76.3%** | **84.7%** | **62.7%** | **73.3%** |
+| Improvement | +14.1 pts | +19.4 pts | +7.4 pts | **+18.6 pts** |
 
 **What this means:**
 - On **complaints**, the reviews the business acts on, the LLM picks the right topic **73% of the time vs 55%** for keywords.
