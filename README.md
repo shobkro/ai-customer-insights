@@ -59,10 +59,16 @@ flowchart LR
 
 Evaluated on 150 hand-labelled reviews (`data/eval/gold_labels.csv`). Full report: [`results/evaluation.md`](results/evaluation.md).
 
-| Method | Sentiment vs stars | Sentiment (hand labels) | Topic (hand labels) | Complaint topic |
+| Method | Sentiment vs stars | Sentiment (hand labels) | Topic (hand labels) | **Complaint topic** |
 |---|---|---|---|---|
 | Keyword baseline (no AI) | 62.2% | 65.3% | 55.3% | 54.7% |
-| LLM (Ollama `qwen2.5:7b`) | *see results/evaluation.md* | | | |
+| **LLM via Ollama (local, free)** | **77.5%** | **84.7%** | **62.7%** | **73.3%** |
+| Improvement | +15.3 pts | +19.4 pts | +7.4 pts | **+18.6 pts** |
+
+**What this means:**
+- On **complaints**, the reviews the business acts on, the LLM picks the right topic **73% of the time vs 55%** for keywords.
+- Overall topic accuracy improves less (+7 pts) because the hardest cases are vague or mixed reviews ("other" vs "praise", or a review that mentions both a delay and a broken item). The confusion matrix in [`results/evaluation.md`](results/evaluation.md) shows exactly where it struggles.
+- So the AI labels are good enough for **trends and prioritisation** (which complaint is growing?) but not for automatically making decisions about individual customers. That's why the dashboard shows the measured accuracy next to the AI charts.
 
 > Sentiment vs stars is a deliberately tough check: people often give 5★ while mentioning a problem, or 1★ with a short neutral comment.
 

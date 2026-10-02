@@ -9,9 +9,9 @@ I measured its accuracy against reviews I labelled by hand instead of just trust
 Streamlit app where anyone can ask questions in plain English. The AI writes SQL, but guardrails make
 sure it can only run safe, read-only queries."
 
-## CV bullets (update the numbers after your LLM run)
+## CV bullets
 - Built an end-to-end analytics pipeline (Python, SQL, Power BI, Excel) on 99k e-commerce orders; identified late delivery as the main driver of 1–2★ reviews (54% of late orders vs 9% on time).
-- Used an open-source LLM (Ollama) to classify 40k Portuguese customer reviews into sentiment, complaint topic and urgency; validated against 150 hand-labelled reviews (**XX%** topic accuracy vs 55% keyword baseline).
+- Used a free open-source LLM (Ollama) to classify Portuguese customer reviews by sentiment, complaint topic and urgency; validated against 150 hand-labelled reviews: 85% sentiment accuracy and 73% complaint-topic accuracy, vs 65% and 55% for a keyword baseline.
 - Developed a natural-language "ask your data" app (Streamlit, text-to-SQL) with guardrails: SELECT-only, table allow-list, read-only connection, query timeout.
 - Designed a Power BI star-schema model with DAX time-intelligence measures and an Excel KPI pack with an AI-drafted, analyst-reviewed executive summary.
 
@@ -23,7 +23,8 @@ sure it can only run safe, read-only queries."
 5. **Explain this DAX:** `Revenue MoM %`, `DATEADD`, and why `dim_date` must be marked as a date table.
 6. **Explain this SQL:** Q7 uses `ROW_NUMBER() OVER (PARTITION BY customer ORDER BY purchase)` to find each customer's first order.
 7. **Why Ollama instead of ChatGPT?** It's free, private (data never leaves the laptop) and reproducible (temperature 0, fixed model).
-8. **What would you improve?** More hand labels, try a larger model, predict late deliveries before they happen.
+8. **Why is overall topic accuracy only 63% when complaint accuracy is 73%?** Positive and vague reviews are hard to separate ("praise" vs "other"), and mixed reviews have two valid topics. For the business, complaint accuracy matters most, and that's where the LLM gained 19 points.
+9. **What would you improve?** More hand labels, try a larger model, predict late deliveries before they happen.
 
 ## Before an interview, make sure you can
 - Run `python run_all.py` and `streamlit run app/streamlit_app.py` from scratch
