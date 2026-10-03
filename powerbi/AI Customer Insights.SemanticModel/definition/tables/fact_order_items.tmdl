@@ -1,0 +1,66 @@
+table fact_order_items
+
+	column order_id
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: order_id
+
+	column order_item_id
+		dataType: int64
+		isHidden
+		formatString: 0
+		summarizeBy: none
+		sourceColumn: order_item_id
+
+	column product_id
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: product_id
+
+	column seller_id
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: seller_id
+
+	column price
+		dataType: double
+		formatString: """R$ ""#,0.00"
+		summarizeBy: sum
+		sourceColumn: price
+
+	column freight_value
+		dataType: double
+		formatString: """R$ ""#,0.00"
+		summarizeBy: sum
+		sourceColumn: freight_value
+
+	partition fact_order_items = m
+		mode: import
+		source =
+				let
+				    Raw = if Text.StartsWith(DataFolder, "http")
+				        then Web.Contents(DataFolder & "fact_order_items.csv.gz")
+				        else File.Contents(DataFolder & "fact_order_items.csv.gz"),
+				    Parsed = Csv.Document(
+				        Binary.Decompress(Raw, Compression.GZip),
+				        [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]
+				    ),
+				    Promoted = Table.PromoteHeaders(Parsed, [PromoteAllScalars = true]),
+				    Typed = Table.TransformColumnTypes(
+				        Promoted,
+				        {
+				            {"order_id", type text},
+				            {"order_item_id", Int64.Type},
+				            {"product_id", type text},
+				            {"seller_id", type text},
+				            {"price", type number},
+				            {"freight_value", type number}
+				        },
+				        "en-US"
+				    ),
+				    Result = Typed
+				in
+				    Result

@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Report",
+    "displayName": "AI Customer Insights"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "381af9d8-cf66-5f4b-99b8-210ac7df1dfa"
+  }
+}

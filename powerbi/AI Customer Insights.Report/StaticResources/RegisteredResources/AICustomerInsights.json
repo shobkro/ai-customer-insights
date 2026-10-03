@@ -1,0 +1,19 @@
+{
+  "name": "AI Customer Insights",
+  "dataColors": [
+    "#1F4E79",
+    "#E07A1F",
+    "#2E8B57",
+    "#C0392B",
+    "#7A869A",
+    "#8E6CBF",
+    "#17A2B8",
+    "#C9A227"
+  ],
+  "foreground": "#1F2937",
+  "background": "#FFFFFF",
+  "tableAccent": "#1F4E79",
+  "good": "#2E8B57",
+  "neutral": "#C9A227",
+  "bad": "#C0392B"
+}
