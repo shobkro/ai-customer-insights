@@ -1,0 +1,50 @@
+table dim_product
+
+	column product_id
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: product_id
+
+	column category
+		dataType: string
+		summarizeBy: none
+		sourceColumn: category
+
+	column weight_g
+		dataType: double
+		formatString: #,0
+		summarizeBy: average
+		sourceColumn: weight_g
+
+	column photos_qty
+		dataType: int64
+		formatString: 0
+		summarizeBy: average
+		sourceColumn: photos_qty
+
+	partition dim_product = m
+		mode: import
+		source =
+				let
+				    Raw = if Text.StartsWith(DataFolder, "http")
+				        then Web.Contents(DataFolder & "dim_product.csv.gz")
+				        else File.Contents(DataFolder & "dim_product.csv.gz"),
+				    Parsed = Csv.Document(
+				        Binary.Decompress(Raw, Compression.GZip),
+				        [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]
+				    ),
+				    Promoted = Table.PromoteHeaders(Parsed, [PromoteAllScalars = true]),
+				    Typed = Table.TransformColumnTypes(
+				        Promoted,
+				        {
+				            {"product_id", type text},
+				            {"category", type text},
+				            {"weight_g", type number},
+				            {"photos_qty", Int64.Type}
+				        },
+				        "en-US"
+				    ),
+				    Result = Typed
+				in
+				    Result

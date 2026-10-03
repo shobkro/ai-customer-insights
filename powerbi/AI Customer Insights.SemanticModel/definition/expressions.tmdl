@@ -1,0 +1,2 @@
+/// Where the .csv.gz files are: a URL ending in "/" or a local folder ending in "\"
+expression DataFolder = "https://raw.githubusercontent.com/shobkro/ai-customer-insights/claude/ai-project-power-bi-zxrtnv/powerbi/data/" meta [IsParameterQuery = true, Type = "Text", IsParameterQueryRequired = true]

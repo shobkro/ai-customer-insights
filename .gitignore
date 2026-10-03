@@ -5,7 +5,8 @@
 # data that scripts regenerate (too big for GitHub)
 data/raw/
 data/olist.db
-powerbi/data/
+powerbi/data/*.csv
+!powerbi/data/*.csv.gz
 results/sql/
 
 # python

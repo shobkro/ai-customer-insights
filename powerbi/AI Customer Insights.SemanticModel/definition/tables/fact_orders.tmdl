@@ -1,0 +1,132 @@
+table fact_orders
+
+	column order_id
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: order_id
+
+	column customer_id
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: customer_id
+
+	column order_status
+		dataType: string
+		summarizeBy: none
+		sourceColumn: order_status
+
+	column purchase_ts
+		dataType: dateTime
+		formatString: General Date
+		summarizeBy: none
+		sourceColumn: purchase_ts
+
+	column purchase_date
+		dataType: dateTime
+		formatString: Short Date
+		summarizeBy: none
+		sourceColumn: purchase_date
+
+	column delivered_ts
+		dataType: dateTime
+		formatString: General Date
+		summarizeBy: none
+		sourceColumn: delivered_ts
+
+	column estimated_delivery_ts
+		dataType: dateTime
+		formatString: General Date
+		summarizeBy: none
+		sourceColumn: estimated_delivery_ts
+
+	column delivery_days
+		dataType: double
+		formatString: 0.0
+		summarizeBy: average
+		sourceColumn: delivery_days
+
+	column days_late
+		dataType: double
+		formatString: 0.0
+		summarizeBy: average
+		sourceColumn: days_late
+
+	column is_late
+		dataType: int64
+		formatString: 0
+		summarizeBy: none
+		sourceColumn: is_late
+
+	column order_value
+		dataType: double
+		formatString: """R$ ""#,0.00"
+		summarizeBy: sum
+		sourceColumn: order_value
+
+	column freight_value
+		dataType: double
+		formatString: """R$ ""#,0.00"
+		summarizeBy: sum
+		sourceColumn: freight_value
+
+	column payment_type
+		dataType: string
+		summarizeBy: none
+		sourceColumn: payment_type
+
+	column installments
+		dataType: int64
+		formatString: 0
+		summarizeBy: none
+		sourceColumn: installments
+
+	column 'Lateness Bucket' =
+			SWITCH (
+			    TRUE (),
+			    ISBLANK ( fact_orders[days_late] ), "Not delivered",
+			    fact_orders[days_late] <= -7, "1. 7+ days early",
+			    fact_orders[days_late] <= 0, "2. 0-7 days early",
+			    fact_orders[days_late] <= 3, "3. 1-3 days late",
+			    fact_orders[days_late] <= 7, "4. 4-7 days late",
+			    "5. 8+ days late"
+			)
+		dataType: string
+		summarizeBy: none
+
+	partition fact_orders = m
+		mode: import
+		source =
+				let
+				    Raw = if Text.StartsWith(DataFolder, "http")
+				        then Web.Contents(DataFolder & "fact_orders.csv.gz")
+				        else File.Contents(DataFolder & "fact_orders.csv.gz"),
+				    Parsed = Csv.Document(
+				        Binary.Decompress(Raw, Compression.GZip),
+				        [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]
+				    ),
+				    Promoted = Table.PromoteHeaders(Parsed, [PromoteAllScalars = true]),
+				    Typed = Table.TransformColumnTypes(
+				        Promoted,
+				        {
+				            {"order_id", type text},
+				            {"customer_id", type text},
+				            {"order_status", type text},
+				            {"purchase_ts", type datetime},
+				            {"purchase_date", type date},
+				            {"delivered_ts", type datetime},
+				            {"estimated_delivery_ts", type datetime},
+				            {"delivery_days", type number},
+				            {"days_late", type number},
+				            {"is_late", Int64.Type},
+				            {"order_value", type number},
+				            {"freight_value", type number},
+				            {"payment_type", type text},
+				            {"installments", Int64.Type}
+				        },
+				        "en-US"
+				    ),
+				    Result = Typed
+				in
+				    Result

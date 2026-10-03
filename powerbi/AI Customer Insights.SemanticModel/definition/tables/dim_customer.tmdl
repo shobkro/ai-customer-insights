@@ -1,0 +1,51 @@
+table dim_customer
+
+	column customer_id
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: customer_id
+
+	column customer_unique_id
+		dataType: string
+		isHidden
+		summarizeBy: none
+		sourceColumn: customer_unique_id
+
+	column city
+		dataType: string
+		dataCategory: City
+		summarizeBy: none
+		sourceColumn: city
+
+	column state
+		dataType: string
+		dataCategory: StateOrProvince
+		summarizeBy: none
+		sourceColumn: state
+
+	partition dim_customer = m
+		mode: import
+		source =
+				let
+				    Raw = if Text.StartsWith(DataFolder, "http")
+				        then Web.Contents(DataFolder & "dim_customer.csv.gz")
+				        else File.Contents(DataFolder & "dim_customer.csv.gz"),
+				    Parsed = Csv.Document(
+				        Binary.Decompress(Raw, Compression.GZip),
+				        [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]
+				    ),
+				    Promoted = Table.PromoteHeaders(Parsed, [PromoteAllScalars = true]),
+				    Typed = Table.TransformColumnTypes(
+				        Promoted,
+				        {
+				            {"customer_id", type text},
+				            {"customer_unique_id", type text},
+				            {"city", type text},
+				            {"state", type text}
+				        },
+				        "en-US"
+				    ),
+				    Result = Typed
+				in
+				    Result

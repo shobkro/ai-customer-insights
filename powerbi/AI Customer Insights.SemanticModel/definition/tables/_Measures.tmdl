@@ -1,0 +1,139 @@
+table _Measures
+
+	measure Orders = COUNTROWS ( fact_orders )
+		formatString: #,0
+		displayFolder: Sales
+
+	measure 'Delivered Orders' = CALCULATE ( COUNTROWS ( fact_orders ), fact_orders[order_status] = "delivered" )
+		formatString: #,0
+		displayFolder: Sales
+
+	measure Revenue = CALCULATE ( SUM ( fact_orders[order_value] ), fact_orders[order_status] = "delivered" )
+		formatString: """R$ ""#,0"
+		displayFolder: Sales
+
+	measure 'Avg Order Value' = DIVIDE ( [Revenue], [Delivered Orders] )
+		formatString: """R$ ""#,0.00"
+		displayFolder: Sales
+
+	measure Customers =
+			CALCULATE (
+			    DISTINCTCOUNT ( dim_customer[customer_unique_id] ),
+			    fact_orders[order_status] = "delivered",
+			    CROSSFILTER ( fact_orders[customer_id], dim_customer[customer_id], BOTH )
+			)
+		formatString: #,0
+		displayFolder: Sales
+
+	measure 'Revenue PM' = CALCULATE ( [Revenue], DATEADD ( dim_date[Date], -1, MONTH ) )
+		formatString: """R$ ""#,0"
+		displayFolder: Time
+
+	measure 'Revenue MoM %' = DIVIDE ( [Revenue] - [Revenue PM], [Revenue PM] )
+		formatString: 0.0%
+		displayFolder: Time
+
+	measure 'Revenue YTD' = TOTALYTD ( [Revenue], dim_date[Date] )
+		formatString: """R$ ""#,0"
+		displayFolder: Time
+
+	measure 'Revenue 3M Rolling Avg' =
+			VAR LastDate = MAX ( dim_date[Date] )
+			VAR Months =
+			    CALCULATETABLE (
+			        VALUES ( dim_date[year_month] ),
+			        DATESINPERIOD ( dim_date[Date], LastDate, -3, MONTH )
+			    )
+			RETURN
+			    AVERAGEX ( Months, CALCULATE ( [Revenue] ) )
+		formatString: """R$ ""#,0"
+		displayFolder: Time
+
+	measure 'Late Orders' = CALCULATE ( COUNTROWS ( fact_orders ), fact_orders[is_late] = 1 )
+		formatString: #,0
+		displayFolder: Delivery
+
+	measure 'Late Delivery %' =
+			DIVIDE (
+			    [Late Orders],
+			    CALCULATE ( COUNTROWS ( fact_orders ), NOT ISBLANK ( fact_orders[is_late] ) )
+			)
+		formatString: 0.0%
+		displayFolder: Delivery
+
+	measure 'Avg Delivery Days' = CALCULATE ( AVERAGE ( fact_orders[delivery_days] ), fact_orders[order_status] = "delivered" )
+		formatString: 0.0
+		displayFolder: Delivery
+
+	measure Reviews = COUNTROWS ( fact_reviews )
+		formatString: #,0
+		displayFolder: Satisfaction
+
+	measure 'Avg Review Score' = AVERAGE ( fact_reviews[review_score] )
+		formatString: 0.00
+		displayFolder: Satisfaction
+
+	measure '% 1-2 Star Reviews' =
+			DIVIDE (
+			    CALCULATE ( COUNTROWS ( fact_reviews ), fact_reviews[review_score] <= 2 ),
+			    COUNTROWS ( fact_reviews )
+			)
+		formatString: 0.0%
+		displayFolder: Satisfaction
+
+	measure 'Avg Score On Time' = CALCULATE ( [Avg Review Score], fact_orders[is_late] = 0 )
+		formatString: 0.00
+		displayFolder: Satisfaction
+
+	measure 'Avg Score Late' = CALCULATE ( [Avg Review Score], fact_orders[is_late] = 1 )
+		formatString: 0.00
+		displayFolder: Satisfaction
+
+	measure 'Score Gap Late vs On Time' = [Avg Score On Time] - [Avg Score Late]
+		formatString: 0.00
+		displayFolder: Satisfaction
+
+	measure 'Labelled Reviews' = COUNTROWS ( review_ai_labels )
+		formatString: #,0
+		displayFolder: AI labels
+
+	measure 'Negative Reviews (AI)' = CALCULATE ( COUNTROWS ( review_ai_labels ), review_ai_labels[sentiment] = "negative" )
+		formatString: #,0
+		displayFolder: AI labels
+
+	measure 'Negative Share (AI)' = DIVIDE ( [Negative Reviews (AI)], [Labelled Reviews] )
+		formatString: 0.0%
+		displayFolder: AI labels
+
+	measure 'High Urgency Reviews' = CALCULATE ( COUNTROWS ( review_ai_labels ), review_ai_labels[urgency] = "high" )
+		formatString: #,0
+		displayFolder: AI labels
+
+	measure 'Topic Share of Complaints' =
+			DIVIDE (
+			    [Negative Reviews (AI)],
+			    CALCULATE ( [Negative Reviews (AI)], ALL ( review_ai_labels[topic] ) )
+			)
+		formatString: 0.0%
+		displayFolder: AI labels
+
+	measure 'Overview Title' =
+			"Revenue " & FORMAT ( [Revenue], "R$ #,0" ) & "  ·  Late deliveries "
+			    & FORMAT ( [Late Delivery %], "0.0%" ) & "  ·  Avg review "
+			    & FORMAT ( [Avg Review Score], "0.00" ) & "★"
+		displayFolder: Titles
+
+	column Placeholder
+		dataType: int64
+		isHidden
+		formatString: 0
+		summarizeBy: none
+		sourceColumn: Placeholder
+
+	partition _Measures = m
+		mode: import
+		source =
+				let
+				    Source = #table(type table [Placeholder = Int64.Type], {})
+				in
+				    Source

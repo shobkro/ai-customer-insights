@@ -85,7 +85,7 @@ Evaluated on 150 hand-labelled reviews (`data/eval/gold_labels.csv`). Full repor
 | Python | pandas, scikit-learn (metrics), requests, matplotlib, plotly |
 | AI | **Ollama** (local, no key), or **Groq** / **Gemini** free tiers; same code via `src/llm.py` |
 | App | Streamlit (deployable free on Streamlit Community Cloud) |
-| BI | Power BI Desktop: star schema, DAX measures, time intelligence ([guide](powerbi/BUILD_GUIDE.md)) |
+| BI | Power BI Desktop: ready-made project (`.pbip`, model as TMDL + report as PBIR), star schema, 24 DAX measures, time intelligence ([guide](powerbi/BUILD_GUIDE.md)) |
 | Excel | KPI pack with `INDEX/MATCH` month selector, data validation, charts, formulas, not pasted values |
 | Quality | pytest: SQL guardrails, JSON parsing, and an end-to-end test against a mock LLM server |
 
@@ -100,6 +100,7 @@ ai-customer-insights/
 │   ├── 03_label_reviews.py     # AI labels for review text (resumable)
 │   ├── 04_evaluate.py          # accuracy vs star ratings + hand labels
 │   ├── 05_export_powerbi.py    # CSVs for Power BI
+│   ├── 07_build_powerbi_project.py  # writes the Power BI project (.pbip)
 │   ├── 06_excel_kpi_pack.py    # Excel KPI pack + AI-drafted summary
 │   ├── run_sql_analysis.py     # runs every business query -> results/
 │   └── make_readme_charts.py
@@ -110,7 +111,8 @@ ai-customer-insights/
 │   ├── text_to_sql.py          # question -> SQL -> answer
 │   └── sql_guard.py            # guardrails for AI-written SQL
 ├── sql/                        # schema + 10 business queries
-├── powerbi/                    # build guide + DAX measures (+ your .pbix)
+├── powerbi/                    # AI Customer Insights.pbip (open in Power BI Desktop),
+│                               # model (TMDL), report (PBIR), data/*.csv.gz, guide, DAX
 ├── excel/KPI_Pack.xlsx
 ├── data/eval/gold_labels.csv   # 150 hand-labelled reviews
 ├── results/                    # evaluation.md, sql_findings.md
@@ -137,6 +139,12 @@ pytest -q
 ```
 
 No GPU or paid key is needed. Groq and Gemini are drop-in alternatives with free tiers (set them in `.env`).
+
+### Open the Power BI dashboard
+Install the free Power BI Desktop (Windows) and double-click `powerbi/AI Customer Insights.pbip`.
+It loads its data straight from this repo, so no Python is needed. 4 pages: executive overview,
+delivery vs satisfaction, what customers say (AI), seller watch-list.
+Details and the numbers to expect: [`powerbi/BUILD_GUIDE.md`](powerbi/BUILD_GUIDE.md).
 
 ### Deploy the app for free
 Push to GitHub → [share.streamlit.io](https://share.streamlit.io) → New app → `app/streamlit_app.py`.

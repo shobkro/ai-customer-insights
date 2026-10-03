@@ -1,0 +1,28 @@
+relationship dda2d456-10df-5e13-9710-cc1579f4d66d
+	fromColumn: fact_orders.customer_id
+	toColumn: dim_customer.customer_id
+
+relationship 714a681c-7347-56ee-8253-eec54e063a6a
+	fromColumn: fact_orders.purchase_date
+	toColumn: dim_date.Date
+
+relationship 0b7d48ab-3dcf-5719-8f03-86e7cce28451
+	crossFilteringBehavior: bothDirections
+	fromColumn: fact_order_items.order_id
+	toColumn: fact_orders.order_id
+
+relationship d49b1626-7892-5b95-800d-27f3b771783d
+	fromColumn: fact_order_items.product_id
+	toColumn: dim_product.product_id
+
+relationship 5c468054-c8e9-5cca-a8eb-ae026bec5a11
+	fromColumn: fact_order_items.seller_id
+	toColumn: dim_seller.seller_id
+
+relationship 502205e5-9222-5899-9b9a-dffbc548332f
+	fromColumn: fact_reviews.order_id
+	toColumn: fact_orders.order_id
+
+relationship 1610e6dd-5a70-5ed5-b8c6-04b37075546e
+	fromColumn: review_ai_labels.review_key
+	toColumn: fact_reviews.review_key
